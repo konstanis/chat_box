@@ -1,0 +1,82 @@
+from math import log
+from math import ceil
+import argparse
+
+parser = argparse.ArgumentParser(description = "loan calculator")
+parser.add_argument("-t", "--type")
+parser.add_argument("-pa", "--payment")
+parser.add_argument("-pr", "--principal")
+parser.add_argument("-pe", "--periods")
+parser.add_argument("-i", "--interest")
+args = parser.parse_args()
+data = [args.type, args.payment, args.principal, args.periods,
+        args.interest]
+
+def monthly_amount(p, a, i):
+    n = log(a / (a - i * p), 1 + i)
+    return ceil(n)
+
+def monthly_payment(p, n, i):
+    a = p * i *(1 + i) ** n / ((1 + i) ** n - 1)
+    return ceil(a)
+
+def loan_principal(a, n, i):
+    p = a * ((1 + i) ** n - 1) / (i *(1 + i) ** n)
+    return round(p)
+
+def diff_payment(p, i, n):
+    sum_ = 0
+    for m in range(1, n + 1):
+        pay_m = ceil(p / n + i * (p - p * (m - 1) / n))
+        sum_ += pay_m
+        print(f"Month {m}: payment is {pay_m}")
+    return sum_
+        
+
+def years_months(months):
+    n = [months // 12, ceil(months % 12)]
+    list_ = []
+    if n[0] == 1:
+        list_.append("1 year")
+    elif n[0] > 1:
+        list_.append(f"{n[0]} years")
+    if n[0] > 0 and n[1] > 0:
+        list_.append("and")
+    if n[1] == 1:
+        list_.append("1 month")
+    elif n[1] > 1:
+        list_.append(f"{n[1]} months")
+    return " ".join(list_)
+
+
+modes = ['diff', 'annuity']
+
+if (data[0] not in modes
+    or data[4] == None
+    or data[0] == 'diff' and data[1] != None
+    or any([float(data[n]) < 0 for n in range(1, len(data)) if data[n] != None])
+    or len(data) != 5):
+    print("Incorrect parameters")
+else:
+    i = float(data[4]) / 1200
+    if data[0] == 'annuity':
+        if data[3] == None:
+            n = monthly_amount(float(data[2]), float(data[1]), i)
+            years_and_months = years_months(n)
+            print(f"It will take {years_and_months} to repay this loan!")
+            print()
+            print("Overpayment =", str(n * int(data[1]) - int(data[2])))
+        elif data[1] == None:
+            amount_m = monthly_payment(float(data[2]), float(data[3]), i)
+            print(f"Your annuity payment = {amount_m}!")
+            print()
+            print("Overpayment =", str(int(data[3]) * amount_m - int(data[2])))
+        elif data[2] == None:
+            loan = loan_principal(float(data[1]), float(data[3]), i)
+            print(f"Your loan principal = {loan}!")
+            print()
+            print("Overpayment =", str(int(data[3]) * int(data[1]) - loan))
+    else:
+        val = diff_payment(float(data[2]), i, int(data[3]))
+        print()
+        print("Overpayment =", str(ceil(val) - int(data[2])))
