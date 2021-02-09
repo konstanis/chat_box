@@ -1,0 +1,44 @@
+import random
+
+print("H A N G M A N")
+words = ['python', 'java', 'kotlin', 'javascript']
+
+
+while True:
+    hid_word = random.choice(words)
+    start_line = "-" * len(hid_word)
+    line = [n for n in start_line]
+    word = [n for n in hid_word]
+    counter = 0
+    letters = set()
+    letter = ""
+    game = input('Type "play" to play the game, "exit" to quit:')
+    if game == "play":
+        while counter != 8:
+            if any([n == "-" for n in line]):
+                print()
+                print("".join(line))
+                letters.add(letter)
+                letter = input("Input a letter:")
+                if len(list(letter)) != 1:
+                    print("You should input a single letter")
+                    continue
+                if letter.isupper() or not letter.isalpha():
+                    print("Please enter a lowercase English letter")
+                    continue
+                line = [letter if hid_word[n] == letter else line[n] for n in range(len(hid_word))]
+                if letter in letters:
+                    print("You've already guessed this letter")
+                elif letter not in hid_word or letter == "":
+                    counter += 1
+                    print("That letter doesn't appear in the word")
+            elif all([n != "-" for n in line]):
+                print(f"You guessed the word {hid_word}!\nYou survived!")
+                break
+        else:
+            print("You lost!")
+    elif game == "exit":
+        break
+    else:
+        continue
+    
