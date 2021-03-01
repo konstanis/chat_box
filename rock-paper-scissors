@@ -1,0 +1,49 @@
+import random
+
+def initial(rating, name):
+    for line in rating:
+        name_l, score_l = line.split()
+        if name == name_l:
+            return int(score_l)
+    return 0
+
+def game(person, score, possible_val):
+    leng = int(0.5 * (len(possible_val) - 1))
+    if possible_val.index(person) <= leng:
+        win_comb = possible_val[possible_val.index(person) + 1:possible_val.index(person) + 1 + leng]
+    else:
+        win_comb = possible_val[possible_val.index(person) + 1:] + possible_val[0:possible_val.index(person) - leng]
+    comp = random.choice(possible_val)
+    if person == comp:
+        print(f'There is a draw ({comp})')
+        return score + 50
+    elif comp not in win_comb:
+        print(f"Well done. The computer chose {comp} and failed")
+        return score + 100
+    else:
+        print(f"Sorry, but the computer chose {comp}")
+        return score
+
+
+rating = open('rating.txt', 'r')
+name = input('Enter your name:')
+print('Hello,', name)
+score = initial(rating, name)
+rating.close()
+
+possible_val = input().split(',')
+if possible_val == ['']:
+    possible_val = ['scissors', 'rock', 'paper']
+print("Okay, let's start")
+
+while True:
+    choice = input()
+    if choice == "!exit":
+        print("Bye!")
+        break
+    elif choice == "!rating":
+        print("Your rating:", score)
+    elif choice not in possible_val:
+        print("Invalid input")
+    else:
+        score = game(choice, score, possible_val)
